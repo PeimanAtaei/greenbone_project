@@ -45,26 +45,6 @@ def get_results(scan_id):
     results = retrieve_results(scan_id)  # Retrieve results
     return jsonify(results)
 
-# Route to delete a target by target name
-@app.route('/delete_target', methods=['POST'])
-def delete_target_api():
-    """
-    API endpoint to delete a target.
-    Expects JSON payload with 'target_name'.
-    """
-    data = request.json  # Get JSON data from request
-    target_name = data.get('target_name')  # Extract target name
-    
-    # Validate input data
-    if not target_name:
-        return jsonify({"error": "target_name is required"}), 400
-    
-    # Delete target and return result
-    result = delete_target(target_name)
-    if "error" in result:
-        return jsonify(result), 404
-    return jsonify(result)
-
 # Function to delete target if it exists
 def delete_target_if_exists(gmp, target_name):
     """
@@ -201,40 +181,6 @@ def retrieve_results(scan_id):
             results = process_report(report_dict, scan_name, targets)  # Process report
 
             return results
-    except GvmError as e:
-        return {"error": str(e)}
-    finally:
-        connection.disconnect()
-
-# Function to delete target
-def delete_target(target_name):
-    """
-    Delete a target by its name.
-    
-    Parameters:
-        target_name: Name of the target
-    
-    Returns:
-        Dictionary containing success message or error message
-    """
-    connection = UnixSocketConnection(path='/var/run/gvmd.sock')
-    transform = EtreeTransform()
-
-    try:
-        with Gmp(connection, transform=transform) as gmp:
-            gmp.authenticate(username='admin', password='admin')  # Authenticate
-            
-            targets_resp = gmp.get_targets()  # Get list of targets
-            targets = targets_resp.findall('target')
-
-            for target in targets:
-                if target.find('name').text == target_name:
-                    target_id = target.get('id')
-                    gmp.delete_target(target_id=target_id)  # Delete target
-                    logging.debug(f"Deleted target: {target_name} with ID: {target_id}")
-                    return {"message": f"Target '{target_name}' deleted successfully."}
-            
-            return {"error": f"Target '{target_name}' not found."}
     except GvmError as e:
         return {"error": str(e)}
     finally:
