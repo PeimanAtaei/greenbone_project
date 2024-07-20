@@ -1,0 +1,4 @@
+flask
+gvm-tools
+python-gvm==21.4.0
+xmltodict
