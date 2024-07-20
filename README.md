@@ -1,5 +1,5 @@
 
-# OpenVAS Scan Management API
+# Assignment on vulnerability assessment - Unige
 
 This repository contains a Flask-based web application for managing OpenVAS (Greenbone Vulnerability Management) scans. The API allows users to trigger scans, retrieve scan results, and delete targets.
 
