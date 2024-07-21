@@ -3,6 +3,12 @@
 
 This repository contains a Flask-based web application for managing OpenVAS (Greenbone Vulnerability Management) scans. The API allows users to trigger scans, retrieve scan results.
 
+Also you can see thses videos to know how to run or config the project :
+
+Execution Video : https://youtu.be/EZFYuDr0T0Q
+
+First Config : https://youtu.be/34Cx398p-M8
+
 ## Table of Contents
 
 - [Installation](#installation)
