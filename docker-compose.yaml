@@ -1,4 +1,4 @@
-version: '3.9'
+# version: '3.9'
 
 services:
   vulnerability-tests:
@@ -96,7 +96,9 @@ services:
       - gvmd_socket_vol:/run/gvmd
     depends_on:
       - gvmd
-
+  # Sets log level of openvas to the set LOG_LEVEL within the env
+  # and changes log output to /var/log/openvas instead /var/log/gvm
+  # to reduce likelyhood of unwanted log interferences
   configure-openvas:
     image: greenbone/openvas-scanner:stable
     volumes:
@@ -113,6 +115,7 @@ services:
         touch /var/log/openvas/openvas.log
         chmod 666 /var/log/openvas/openvas.log
 
+  # shows logs of openvas
   openvas:
     image: greenbone/openvas-scanner:stable
     restart: on-failure
@@ -133,6 +136,8 @@ services:
     image: greenbone/openvas-scanner:stable
     restart: on-failure
     environment:
+      # `service_notus` is set to disable everything but notus,
+      # if you want to utilize openvasd directly removed `OPENVASD_MODE`
       OPENVASD_MODE: service_notus
       GNUPGHOME: /etc/openvas/gnupg
       LISTENING: 0.0.0.0:80
@@ -141,6 +146,9 @@ services:
       - openvas_log_data_vol:/var/log/openvas
       - gpg_data_vol:/etc/openvas/gnupg
       - notus_data_vol:/var/lib/notus
+    # enable port forwarding when you want to use the http api from your host machine
+    # ports:
+    #   - 127.0.0.1:3000:80
     depends_on:
       vulnerability-tests:
         condition: service_completed_successfully
@@ -158,21 +166,21 @@ services:
     restart: on-failure
     hostname: ospd-openvas.local
     cap_add:
-      - NET_ADMIN
-      - NET_RAW
+      - NET_ADMIN # for capturing packages in promiscuous mode
+      - NET_RAW # for raw sockets e.g. used for the boreas alive detection
     security_opt:
       - seccomp=unconfined
       - apparmor=unconfined
     command:
       [
-        'ospd-openvas',
-        '-f',
-        '--config',
-        '/etc/gvm/ospd-openvas.conf',
-        '--notus-feed-dir',
-        '/var/lib/notus/advisories',
-        '-m',
-        '666',
+        "ospd-openvas",
+        "-f",
+        "--config",
+        "/etc/gvm/ospd-openvas.conf",
+        "--notus-feed-dir",
+        "/var/lib/notus/advisories",
+        "-m",
+        "666"
       ]
     volumes:
       - gpg_data_vol:/etc/openvas/gnupg
@@ -200,15 +208,15 @@ services:
     depends_on:
       - gvmd
       - ospd-openvas
-
-  flask-app:
-    build: .
-    ports:
-      - '5000:5000'
-    volumes:
-      - gvmd_socket_vol:/var/run/
-    depends_on:
-      - gvmd
+  
+  # flask-app:
+  #   build: .
+  #   ports:
+  #     - '5000:5000'
+  #   volumes:
+  #     - gvmd_socket_vol:/var/run/
+  #   depends_on:
+  #     - gvmd
 
 volumes:
   gpg_data_vol:
