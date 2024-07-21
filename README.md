@@ -5,9 +5,9 @@ This repository contains a Flask-based web application for managing OpenVAS (Gre
 
 Also you can see thses videos to know how to run or config the project :
 
-Execution Video : https://youtu.be/EZFYuDr0T0Q
+Run the project and get the result : https://youtu.be/EZFYuDr0T0Q
 
-First Config : https://youtu.be/34Cx398p-M8
+How to config for the first time on your system and run the project : https://youtu.be/34Cx398p-M8
 
 ## Table of Contents
 
